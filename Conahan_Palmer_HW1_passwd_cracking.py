@@ -13,22 +13,34 @@
 
 import hashlib
 
+
 passwordHashes = open("hashes.txt", "r")
 
-wordList = open("words.txt", "r") #"/usr/share/dict/words"
-wordListHashes = open("wordListHashes.txt", "w+")
+crackedPasses = open("crackedPasses.txt", "w")
 
-def hashWords(inFile,outFile):
-    for word in inFile:
-        sha = hashlib.sha256()
-        sha.update(word.encode())
-        outFile.write(sha.hexdigest() + "\n")
 
+def ruleFive(passHashes):
+    print("Attempting to crack using rule five")
+    for line in passHashes:
+        splitLine = line.split(":")
+        passHash = splitLine[1]
+        wordList = open("words.txt", "r") #"/usr/share/dict/words"
+        for wordLine in wordList:
+            word = wordLine.split()
+            sha = hashlib.sha256()
+            sha.update(word[0].encode())
+            if sha.hexdigest() == passHash:
+                print ("Cracked Password: " + word[0])
+                crackedPasses.write("encrypted:" + word[0])
+                break
+        wordList.close()
+            
+                
 def main():
-    hashWords(wordList,wordListHashes)
+    ruleFive(passwordHashes)
+    
 
 main()
 
 passwordHashes.close()
-wordList.close()
-wordListHashes.close()
+crackedPasses.close()
