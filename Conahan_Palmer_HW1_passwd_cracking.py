@@ -17,10 +17,6 @@ sys.setdefaultencoding('utf-8')
 
 import hashlib
 
-passwordHashes = open("hashes.txt", "r")
-
-crackedPasses = open("crackedPasses.txt", "w")
-
 def hashWord(word):
     convertWord = word.split()
     sha = hashlib.sha256()
@@ -31,9 +27,10 @@ def retHash(pwLine):
     splitLine = pwLine.split(":")
     return splitLine[1]
 
-def ruleOne(passHashes):
+def ruleOne():
     pwFound = bool(0)
     wordList = open("words", "r")
+    passHash = open("hashes.txt", "r")
     print("Attempting to crack using rule one")
 
     while(not pwFound):
@@ -48,9 +45,9 @@ def ruleOne(passHashes):
                 capAppendNum = capAppend.strip() + str(num)
                 #print(capAppendNum)
                 num = num + 1
-                passHashes.seek(0)
+                passHash.seek(0)
                
-                for passHashLine in passHashes:
+                for passHashLine in passHash:
                     #print("Comparing " + capAppendNum + ": " + hashWord(capAppendNum) + " with " + retHash(passHashLine))
                     if hashWord(capAppendNum) == retHash(passHashLine):
                         print("Cracked Password: " + capAppendNum)
@@ -58,29 +55,40 @@ def ruleOne(passHashes):
                         num = 10
         elif not line:
             pwFound = bool(1)
-            wordList.close()
 
-def ruleFive(passHashes):
+    wordList.close()
+    passHash.close()
+    #print("Text files closed.")
+
+def ruleFive():
     pwFound = bool(0)
-    wordList = open("words.txt", "r")
+    wordList = open("words", "r")
+    passHash = open("hashes.txt", "r")
     print("Attempting to crack using rule five")
     
     while(not pwFound):
         line = wordList.readline()
-        stripLine = line.strip()
-        passHashes.seek(0)
 
-        for passHashLine in passHashes:
-            #print("Comparing " + stripLine + ": " + hashWord(stripLine) + " with " + retHash(passHashLine))
-            if hashWord(stripLine) == retHash(passHashLine):
-                print("Cracked Password: " + stripLine)
-                pwFound = bool(1)
-                wordList.close()
+        if line:
+            stripLine = line.strip()
+            passHash.seek(0)
 
+            for passHashLine in passHash:
+                #print("Comparing " + stripLine + ": " + hashWord(stripLine) + " with " + retHash(passHashLine))
+                if hashWord(stripLine) == retHash(passHashLine):
+                    print("Cracked Password: " + stripLine)
+                    pwFound = bool(1)
+        else:
+            pwFound = bool(1)
+
+    wordList.close()
+    passHash.close()
+    #print("Text files closed.")
+    
 def main():
-    ruleOne(passwordHashes)
-    ruleFive(passwordHashes)
+    ruleOne()
+    ruleFive()
 
 main()
-passwordHashes.close()
-crackedPasses.close()
+
+
